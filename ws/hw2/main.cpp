@@ -17,12 +17,12 @@ int main(int argc, char** argv) {
 
     // Use WO1 from Exercise 2
     Problem2D problem = HW2::getWorkspace1();
-
+    //problem.obstacles[].vertices.cw;
+    
     // Use WO1 from Exercise 2
-    /*
-    Problem2D problem = HW2::getWorkspace2();
-    */
-
+    
+   //Problem2D problem = HW2::getWorkspace2();
+    
     // Make a random environment spec, edit properties about it such as the number of obstacles
     /*
     Random2DEnvironmentSpecification spec;
@@ -41,10 +41,13 @@ int main(int argc, char** argv) {
     {
         // Call your algorithm on the problem
         amp::Path2D path = algo.plan(problem);
-
+        // Testing the line segment intersection function
+        // bool Inside = algo.lineSegmentIntersection(problem, Eigen::Vector2d(0,-5.1));
+        // std::cout << Inside << std::endl;
+        
         // Check your path to make sure that it does not collide with the environment 
         bool success = HW2::check(path, problem);
-
+         LOG("path length: " << path.length());
         LOG("Found valid solution to workspace 1: " << (success ? "Yes!" : "No :("));
 
         // Visualize the path and environment
@@ -52,22 +55,22 @@ int main(int argc, char** argv) {
     }
 
     // Let's get crazy and generate a random environment and test your algorithm
-    {
-        amp::Path2D path; // Make empty path, problem, and collision points, as they will be created by generateAndCheck()
-        amp::Problem2D random_prob; 
-        std::vector<Eigen::Vector2d> collision_points;
-        bool random_trial_success = HW2::generateAndCheck(algo, path, random_prob, collision_points);
-        LOG("Found valid solution in random environment: " << (random_trial_success ? "Yes!" : "No :("));
+    // {
+    //     amp::Path2D path; // Make empty path, problem, and collision points, as they will be created by generateAndCheck()
+    //     amp::Problem2D random_prob; 
+    //     std::vector<Eigen::Vector2d> collision_points;
+    //     bool random_trial_success = HW2::generateAndCheck(algo, path, random_prob, collision_points);
+    //     LOG("Found valid solution in random environment: " << (random_trial_success ? "Yes!" : "No :("));
 
-        LOG("path length: " << path.length());
+    //     LOG("path length: " << path.length());
 
-        // Visualize the path environment, and any collision points with obstacles
-        Visualizer::makeFigure(random_prob, path, collision_points);
-    }
+    //     // Visualize the path environment, and any collision points with obstacles
+    //     Visualizer::makeFigure(random_prob, path, collision_points);
+    // }
 
     Visualizer::showFigures();
 
-    HW2::grade(algo, "nonhuman.biologic@myspace.edu", argc, argv);
+    HW2::grade(algo, "owen.craig@colorado.edu", argc, argv);
     
     /* If you want to reconstruct your bug algorithm object every trial (to reset member variables from scratch or initialize), use this method instead*/
     //HW2::grade<MyBugAlgorithm>("nonhuman.biologic@myspace.edu", argc, argv, constructor_parameter_1, constructor_parameter_2, etc...);
