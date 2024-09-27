@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <Eigen/Core>
-
+#include "ConfigurationSpace.h"
 #include "tools/Serializer.h"
 
 namespace amp {

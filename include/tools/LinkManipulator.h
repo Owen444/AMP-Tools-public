@@ -2,10 +2,8 @@
 
 #include <vector>
 #include <Eigen/Core>
-
 #include "tools/Path.h"
 #include "tools/Serializer.h"
-
 namespace amp {
 
 /// @brief Vector of angles (radians) for each joint. The size of the vector should match the 
