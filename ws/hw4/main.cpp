@@ -41,8 +41,8 @@ int main(int argc, char** argv) {
         rot_obstacles_C.push_back(obstacle_rot_C);
         rot_obstacles.push_back(obstacle_rot);
     }
-    Visualizer::makeFigure(rot_obstacles);
-    Visualizer::makeFigure(rot_obstacles_C,angles);
+    // Visualizer::makeFigure(rot_obstacles);
+    // Visualizer::makeFigure(rot_obstacles_C,angles);
 
     // Problem 2 Code
     // Forward Kinematics
@@ -58,16 +58,16 @@ int main(int argc, char** argv) {
     // // The visualizer uses your implementation of forward kinematics to show the joint positions so you can use that to test your FK algorithm
     Visualizer::makeFigure(manipulator, test_state); 
     // Inverse Kinematics
-    Eigen::Vector2d end_effector_location(2.0, 0.0);
+    Eigen::Vector2d end_effector_location(0.146342, 0.586717);
     amp::ManipulatorState ik_state = manipulator_inverse.getConfigurationFromIK(end_effector_location);
     // // You can visualize your manipulator given an end effector location like so:
     Visualizer::makeFigure(manipulator_inverse, ik_state);
 
-    // Problem 3 Code
-    // Create the collision space constructor
-    std::size_t n_cells = 500;
+    // // Problem 3 Code
+    // // Create the collision space constructor
+     std::size_t n_cells = 500;
     std::vector<double> link_lengths_3 = {1.0, 1.0};
-    MyManipulatorCSConstructor cspace_constructor(n_cells);
+     MyManipulatorCSConstructor cspace_constructor(n_cells);
     MyManipulator2D manipulator_3(link_lengths_3);
     // Create the collision space using a given manipulator and environment
     std::unique_ptr<amp::GridCSpace2D> cspace1 = cspace_constructor.construct(manipulator_3, HW4::getEx3Workspace1());
@@ -83,7 +83,7 @@ int main(int argc, char** argv) {
     Visualizer::showFigures();
 
     // // Grade method
-   // amp::HW4::grade<MyManipulator2D>(cspace_constructor, "owen.craig@colorado.edu", argc, argv);
+    amp::HW4::grade<MyManipulator2D>(cspace_constructor, "owen.craig@colorado.edu", argc, argv);
     return 0;
 }
 // Create a function that takes the minkowski sum of two polygons this function should take in two objects of class Obstacle2D and return a new object of class Obstacle2D. The function should be called getMinkowskiSum. The function should be a static member of the HW4 class. 
