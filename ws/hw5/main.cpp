@@ -35,8 +35,8 @@ int main(int argc, char** argv) {
     // bool success = HW5::generateAndCheck(algo, path1, prob1);
     // Visualizer::makeFigure(prob1, path1);
 
-    // // Visualize your potential function
-    // amp::Visualizer::makeFigure(MyPotentialFunction{algo,prob1}, prob1.x_min, prob1.x_max, prob1.y_min, prob1.y_max, 500);
+    // Visualize your potential function
+    amp::Visualizer::makeFigure(MyPotentialFunction{}, prob.x_min, prob.x_max, prob.y_min, prob.y_max, 20);
     Visualizer::showFigures();
     
     // Arguments following argv correspond to the constructor arguments of MyGDAlgorithm:
