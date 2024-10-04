@@ -38,7 +38,6 @@ class MyPotentialFunction : public amp::PotentialFunction2D {
 		Eigen::Vector2d NesterovUpdate(Eigen::Vector2d& q, double learning_rate, double momentum);
 		// Returns the potential function value (height) for a given 2D point. 
         virtual double operator()(const Eigen::Vector2d& q) const override {
-<<<<<<< HEAD
 			double U_att = Attractor(q);
 			double U_rep = Repulsor(q);
 			return (U_att + U_rep);
@@ -47,12 +46,4 @@ class MyPotentialFunction : public amp::PotentialFunction2D {
 	const MyGDAlgorithm& algorithm; 
 	amp::Problem2D problem;	
 	Eigen::Vector2d velocity;
-=======
-            return q[0] * q[0] + q[1] * q[1];
-        }
-
-		virtual Eigen::Vector2d getGradient(const Eigen::Vector2d& q) const override {
-            return Eigen::Vector2d(q[0] * q[0],  q[1] * q[1]);
-        }
->>>>>>> 63d1215bf02fe84e824c8a70813fc39227259163
 };
