@@ -36,7 +36,6 @@ int main(int argc, char** argv) {
     // Visualizer::makeFigure(prob1, path1);
 
     // Visualize your potential function
-    amp::Visualizer::makeFigure(MyPotentialFunction{}, prob.x_min, prob.x_max, prob.y_min, prob.y_max, 20);
     Visualizer::showFigures();
     
     // Arguments following argv correspond to the constructor arguments of MyGDAlgorithm:
