@@ -1,5 +1,4 @@
 #include "MyGDAlgorithm.h"
-
 // Implement your plan method here, similar to HW2:
 amp::Path2D MyGDAlgorithm::plan(const amp::Problem2D& problem) {
     amp::Path2D path;
@@ -15,17 +14,19 @@ amp::Path2D MyGDAlgorithm::plan(const amp::Problem2D& problem) {
         bool intersect = true;
         int count = 0;
         if (grad.norm() > 20) {
-            std::cout<<"BIG BOI"<<std::endl;
+            // std::cout<<"BIG BOI"<<std::endl;
             grad = grad.normalized();
             q = q - 0.01 * grad;
             path.waypoints.push_back(q);
         } else if (grad.norm() < 0.1) {
+            q = q - 0.01 * grad;
+            path.waypoints.push_back(q);
             count = 0;
             // Take a step in a random direction
-            std::cout << "Taking Random Step" << std::endl;
+            // std::cout << "Taking Random Step" << std::endl;
             while(1){
                 Eigen::Vector2d random_direction = Eigen::Vector2d::Random();
-                q = q - 2 * random_direction;
+                q = q - 2*random_direction;
                 // Check if the new point intersects with any obstacles
                 intersect = HW4Functions::lineSegmentIntersection(problem, path.waypoints.back(), q);
                 if (!intersect) {
@@ -44,17 +45,18 @@ amp::Path2D MyGDAlgorithm::plan(const amp::Problem2D& problem) {
             path.waypoints.push_back(q);
         }
         main_count++;
-        std::cout << "Current Location:" << path.waypoints.back() << std::endl;
-        std::cout << "Distance to Goal:" << (problem.q_goal - path.waypoints.back()).norm() << std::endl;
-        std::cout << "Main Count:"<< main_count<< std::endl;
-        if(main_count > 670-14) {
-            std::cout << "Max Steps Reached" << std::endl;
-            std::cout<<"Current Location"<<path.waypoints.back()<<std::endl;
+        // std::cout << "Current Location:" << path.waypoints.back() << std::endl;
+        // std::cout << "Distance to Goal:" << (problem.q_goal - path.waypoints.back()).norm() << std::endl;
+        // std::cout << "Main Count:"<< main_count<< std::endl;
+        if(main_count > 100000) {
+            // std::cout << "Max Steps Reached" << std::endl;
+            // std::cout<<"Current Location"<<path.waypoints.back()<<std::endl;
             break;
         }
 
     }
     if ((problem.q_goal - path.waypoints.back()).norm() <0.25) {
+        std::cout << "Goal Reached" << std::endl;
         path.waypoints.push_back(problem.q_goal);
     }
     return path;
@@ -153,8 +155,8 @@ Eigen::Vector2d MyPotentialFunction::Gradient(Eigen::Vector2d q) const{
         // std::cout << "Distance::" <<distance_to_obstacle << std::endl;
         // std::cout<< "Closest Point"<<min_point<<std::endl;
         if (distance_to_obstacle <= Q_star){
-            U_rep_grad += eta*(1/Q_star-1/distance_to_obstacle)*(1/(distance_to_obstacle*distance_to_obstacle))*(-min_point.normalized());
-        } else {
+            U_rep_grad += eta*(1/Q_star-1/distance_to_obstacle)*(1/(distance_to_obstacle*distance_to_obstacle))*((q - min_point)/distance_to_obstacle);
+        } else{
             U_rep = 0;
             U_rep_grad += U_rep*(q - min_point)/distance_to_obstacle;
         }
@@ -162,7 +164,7 @@ Eigen::Vector2d MyPotentialFunction::Gradient(Eigen::Vector2d q) const{
     // std::cout << "U_att_grad::" << U_att_grad << std::endl;
     // std::cout << "U_rep_grad::" << U_rep_grad << std::endl;
     grad = U_att_grad + U_rep_grad;
-    std::cout << "Gradient::" << grad << std::endl;
+    // std::cout << "Gradient::" << grad << std::endl;
     return grad;
 }
 

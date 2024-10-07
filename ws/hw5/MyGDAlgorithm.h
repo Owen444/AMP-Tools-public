@@ -43,6 +43,9 @@ class MyPotentialFunction : public amp::PotentialFunction2D {
 			return (U_att + U_rep);
 		}
 	private: 
+	virtual Eigen::Vector2d getGradient(const Eigen::Vector2d& q) const override {
+		return Gradient(q);
+	};
 	const MyGDAlgorithm& algorithm; 
 	amp::Problem2D problem;	
 	Eigen::Vector2d velocity;

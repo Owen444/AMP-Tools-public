@@ -15,7 +15,9 @@ int main(int argc, char** argv) {
 
     // Test your gradient descent algorithm on a random problem.
     //double d_star, double zetta, double Q_star, double eta
-    MyGDAlgorithm algo(2, 1.5, 1, .9);
+    MyGDAlgorithm algo(2, 2.5, .25, .9);
+// 2,2,1,0.9 - Hw5 ws 1 and Hw2 ws 2
+// 2,2.5,0.25,0.9 - Hw2 ws 1
 
 
     // amp::Problem2D prob = HW5::getWorkspace1();
@@ -24,10 +26,11 @@ int main(int argc, char** argv) {
     // amp::Visualizer::makeFigure(MyPotentialFunction{algo,prob}, prob.x_min, prob.x_max, prob.y_min, prob.y_max, 500);
     // bool success = HW5::generateAndCheck(algo, path, prob);
 
-    amp::Problem2D prob = HW2::getWorkspace1();
+    amp::Problem2D prob = HW5::getWorkspace1();
     amp::Path2D path = algo.plan(prob);
     amp::Visualizer::makeFigure(prob, path);
-    amp::Visualizer::makeFigure(MyPotentialFunction{algo,prob}, prob.x_min, prob.x_max, prob.y_min, prob.y_max, 500);
+    std::cout<<"Path Length:"<<path.length()<<std::endl;
+    amp::Visualizer::makeFigure(MyPotentialFunction{algo,prob},prob, 100);
     //bool success = HW5::generateAndCheck(algo, path, prob);
 
     // amp::Path2D path1;
@@ -39,6 +42,6 @@ int main(int argc, char** argv) {
     Visualizer::showFigures();
     
     // Arguments following argv correspond to the constructor arguments of MyGDAlgorithm:
-    //HW5::grade<MyGDAlgorithm>("nonhuman.biologic@myspace.edu", argc, argv, 1.0, 1.0, 1.0, 1.0);
+    //HW5::grade<MyGDAlgorithm>("owen.craig@colorado.edu", argc, argv, 2, 2, 1, .9);
     return 0;
 }
