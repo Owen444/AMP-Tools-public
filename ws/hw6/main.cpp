@@ -12,23 +12,18 @@ using namespace amp;
 int main(int argc, char** argv) {
     /* Include this line to have different randomized environments every time you run your code (NOTE: this has no affect on grade()) */
     amp::RNG::seed(amp::RNG::randiUnbounded());
-<<<<<<< HEAD
-    
-    //amp::HW6::grade<MyPointWFAlgo, MyManipWFAlgo, MyAStarAlgo>("nonhuman.biologic@myspace.edu", argc, argv, std::make_tuple(), std::make_tuple("hey therre"), std::make_tuple());
-    return 0;
-=======
->>>>>>> upstream/main
 
     // You will need your 2-link manipulator from HW4
     MyManipulator2D manipulator;
     Problem2D point_problem = HW2::getWorkspace1();
-    Problem2D manip_problem = HW6::getHW4Problem2();
+    Problem2D manip_problem = HW6::getHW4Problem1();
     
     // Construct point-agent and manipulator cspace instances.
-    std::size_t n_cells = 5;
+    std::size_t n_cells = 500;
+    // Create C Space for point agent and manipulator
     std::shared_ptr<MyPointAgentCSConstructor> point_agent_ctor = std::make_shared<MyPointAgentCSConstructor>(n_cells);
     std::shared_ptr<MyManipulatorCSConstructor> manipulator_ctor = std::make_shared<MyManipulatorCSConstructor>(n_cells);
-    std::shared_ptr<WaveFrontAlgorithm> wf_algo = std::make_shared<MyWaveFrontAlgorithm>();
+    std::shared_ptr<WaveFrontAlgorithm> wf_algo = std::make_shared<MyWaveFrontAlgorithm>(n_cells);
     
     // Populate the cspace cells with collision values for visulaization.
     std::unique_ptr<amp::GridCSpace2D> point_cspace = point_agent_ctor->construct(point_problem);
@@ -55,6 +50,6 @@ int main(int argc, char** argv) {
 
     Visualizer::showFigures();
 
-    amp::HW6::grade<PointWaveFrontAlgorithm, ManipulatorWaveFrontAlgorithm, MyAStarAlgo>("nonhuman.biologic@myspace.edu", argc, argv, std::make_tuple(wf_algo, point_agent_ctor), std::make_tuple(wf_algo, manipulator_ctor), std::make_tuple());
+    //amp::HW6::grade<PointWaveFrontAlgorithm, ManipulatorWaveFrontAlgorithm, MyAStarAlgo>("nonhuman.biologic@myspace.edu", argc, argv, std::make_tuple(wf_algo, point_agent_ctor), std::make_tuple(wf_algo, manipulator_ctor), std::make_tuple());
     return 0;
 }

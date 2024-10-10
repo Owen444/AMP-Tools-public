@@ -2,12 +2,11 @@
 
 // This includes all of the necessary header files in the toolbox
 #include "AMPCore.h"
-
+#include "HW4Functions.h"
 // Include the correct homework headers
 #include "hw/HW4.h"
 #include "hw/HW6.h"
 
-////////////////////// THIS IS FROM HW4 //////////////////////
 
 /* You can just move these classes to shared folder and include them instead of copying them to hw6 project*/
 
@@ -29,22 +28,22 @@ class MyManipulatorCSConstructor : public amp::ManipulatorCSConstructor {
     public:
         // To make things easy, add the number of cells as a ctor param so you can easily play around with it
         MyManipulatorCSConstructor(std::size_t cells_per_dim) : m_cells_per_dim(cells_per_dim) {}
-
+        void GenreateCSpace(MyGridCSpace2D&,const amp::LinkManipulator2D& manipulator,const amp::Environment2D& env);
         // Override this method for computing all of the boolean collision values for each cell in the cspace
         virtual std::unique_ptr<amp::GridCSpace2D> construct(const amp::LinkManipulator2D& manipulator, const amp::Environment2D& env) override;
 
     private:
         std::size_t m_cells_per_dim;
+        double step_size;
 };
 
-//////////////////////////////////////////////////////////////
 
 // Derive the PointAgentCSConstructor class and override the missing method
 class MyPointAgentCSConstructor : public amp::PointAgentCSConstructor {
     public:
         // To make things easy, add the number of cells as a ctor param so you can easily play around with it
         MyPointAgentCSConstructor(std::size_t cells_per_dim) : m_cells_per_dim(cells_per_dim) {}
-
+        bool point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& polygon);
         // Override this method for computing all of the boolean collision values for each cell in the cspace
         virtual std::unique_ptr<amp::GridCSpace2D> construct(const amp::Environment2D& env) override;
 
@@ -53,8 +52,12 @@ class MyPointAgentCSConstructor : public amp::PointAgentCSConstructor {
 };
 
 class MyWaveFrontAlgorithm : public amp::WaveFrontAlgorithm {
-    public:
-        virtual amp::Path2D planInCSpace(const Eigen::Vector2d& q_init, const Eigen::Vector2d& q_goal, const amp::GridCSpace2D& grid_cspace) override;
+public:
+    MyWaveFrontAlgorithm(std::size_t cells_per_dim) : m_cells_per_dim(cells_per_dim) {}
+    virtual amp::Path2D planInCSpace(const Eigen::Vector2d& q_init, const Eigen::Vector2d& q_goal, const amp::GridCSpace2D& grid_cspace) override;
+    std::vector<Eigen::Vector2d> getNeighbors(const Eigen::Vector2d& cell, const amp::GridCSpace2D& grid_cspace);
 
+private:
+    std::size_t m_cells_per_dim;
 };
 
