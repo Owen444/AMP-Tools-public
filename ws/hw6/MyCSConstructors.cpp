@@ -92,6 +92,7 @@ std::unique_ptr<amp::GridCSpace2D> MyPointAgentCSConstructor::construct(const am
     return cspace_ptr;
 }
 
+<<<<<<< HEAD
 
 bool MyPointAgentCSConstructor::point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle){
     std::vector<Eigen::Vector2d> polygon = obstacle.verticesCW();
@@ -149,6 +150,10 @@ bool MyPointAgentCSConstructor::point_in_polygon(Eigen::Vector2d point, const am
 
 amp::Path2D MyWaveFrontAlgorithm::planInCSpace(const Eigen::Vector2d& q_init, const Eigen::Vector2d& q_goal, const amp::GridCSpace2D& grid_cspace) {
     // Given the initial and goal configurations, and the cspace, return a path
+=======
+amp::Path2D MyWaveFrontAlgorithm::planInCSpace(const Eigen::Vector2d& q_init, const Eigen::Vector2d& q_goal, const amp::GridCSpace2D& grid_cspace, bool isManipulator) {
+    // Implement your WaveFront algorithm here
+>>>>>>> upstream/main
     amp::Path2D path;
     int count = 2; 
     path.waypoints.push_back(q_init);
@@ -164,6 +169,11 @@ amp::Path2D MyWaveFrontAlgorithm::planInCSpace(const Eigen::Vector2d& q_init, co
     // Continue until the goal is reached 
     // Use Breadth-First Search (BFS) to find the shortest path
     path.waypoints.push_back(q_goal);
+    if (isManipulator) {
+        Eigen::Vector2d bounds0 = Eigen::Vector2d(0.0, 0.0);
+        Eigen::Vector2d bounds1 = Eigen::Vector2d(2*M_PI, 2*M_PI);
+        amp::unwrapWaypoints(path.waypoints, bounds0, bounds1);
+    }
     return path;
 }
 
