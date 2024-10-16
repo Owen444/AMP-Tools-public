@@ -74,6 +74,7 @@
         "memory_resource": "cpp",
         "utility": "cpp",
         "unordered_set": "cpp",
-        "filesystem": "cpp"
+        "filesystem": "cpp",
+        "types": "cpp"
     }
 }
