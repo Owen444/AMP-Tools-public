@@ -10,7 +10,7 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     nodes[0] = problem.q_init;
     nodes[1] = problem.q_goal;
     //generate n number of random points in the workspace and add them to the graph if not in obstacle
-    int n =100;
+    int n = 1500;
     std::random_device rd;
     std::mt19937 gen(rd());
     Eigen::Vector2d random_node;
@@ -34,11 +34,12 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     }
 
     // Connect nodes
+    double radius = 1.5;
     for (const auto& [node1, point1] : nodes) {
         for (const auto& [node2, point2] : nodes) {
+            double distance = (point1 - point2).norm();
             bool intersect = HW4Functions::lineSegmentIntersection(problem, point1, point2);
-            if (node1 != node2 && !intersect) {
-                double distance = (point1 - point2).norm();
+            if (node1 != node2 && !intersect && distance <= radius) {
                 graphPtr->connect(node1, node2, distance);
             }
         }
@@ -51,7 +52,10 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     graph_problem.graph = graphPtr;
     
     MyAStarAlgo astar;
-    amp::SearchHeuristic heuristic;
+    amp::LookupSearchHeuristic heuristic;
+    for (const auto& [node, point] : nodes) {
+        heuristic.heuristic_values[node] = (point - problem.q_goal).norm();
+    }
     MyAStarAlgo::GraphSearchResult astar_result = astar.search(graph_problem, heuristic);
 
     // Convert node path to waypoints

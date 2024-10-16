@@ -75,6 +75,8 @@
         "utility": "cpp",
         "unordered_set": "cpp",
         "filesystem": "cpp",
-        "types": "cpp"
+        "types": "cpp",
+        "mixinvector": "cpp",
+        "fast_back_stack": "cpp"
     }
 }

@@ -26,3 +26,13 @@ class MyRRT : public amp::GoalBiasRRT2D {
     public:
         virtual amp::Path2D plan(const amp::Problem2D& problem) override; 
 };
+
+struct LookupSearchHeuristic : public amp::SearchHeuristic {
+	/// @brief Get the heuristic value stored in `heuristic_values`. 
+	/// @param node Node to get the heuristic value h(node) for. 
+	/// @return Heuristic value
+	virtual double operator()(amp::Node node) const override {return heuristic_values.at(node);}
+
+    /// @brief Store the heursitic values for each node in a map
+    std::map<amp::Node, double> heuristic_values; 
+};

@@ -20,7 +20,7 @@ int main(int argc, char** argv) {
     // graphPtr->print();
 
     // Test PRM on Workspace1 of HW2
-    Problem2D problem = HW2::getWorkspace1();
+    Problem2D problem = HW5::getWorkspace1();
     MyPRM prm;
     Path2D path = prm.plan(problem);
     Visualizer::makeFigure(problem, path, *prm.getGraphPtr(), prm.getNodes());
