@@ -6,8 +6,8 @@
 // Include the correct homework headers
 #include "hw/HW4.h"
 #include "hw/HW6.h"
-
-
+#include <queue>
+#include <iomanip>
 /* You can just move these classes to shared folder and include them instead of copying them to hw6 project*/
 
 // Derive the amp::GridCSpace2D class and override the missing method
@@ -19,7 +19,6 @@ class MyGridCSpace2D : public amp::GridCSpace2D {
 
         // Override this method for determining which cell a continuous point belongs to
         virtual std::pair<std::size_t, std::size_t> getCellFromPoint(double x0, double x1) const override;
-
 };
 
 
@@ -54,9 +53,13 @@ class MyPointAgentCSConstructor : public amp::PointAgentCSConstructor {
 class MyWaveFrontAlgorithm : public amp::WaveFrontAlgorithm {
 public:
     MyWaveFrontAlgorithm(std::size_t cells_per_dim) : m_cells_per_dim(cells_per_dim) {}
-    virtual amp::Path2D planInCSpace(const Eigen::Vector2d& q_init, const Eigen::Vector2d& q_goal, const amp::GridCSpace2D& grid_cspace) override;
-    std::vector<Eigen::Vector2d> getNeighbors(const Eigen::Vector2d& cell, const amp::GridCSpace2D& grid_cspace);
-
+    virtual amp::Path2D planInCSpace(const Eigen::Vector2d& q_init, const Eigen::Vector2d& q_goal, const amp::GridCSpace2D& grid_cspace, bool isManipulator) override;
+    std::vector<std::pair<int, int>> getNeighborsManipulator(const Eigen::Vector2d& cell, const amp::GridCSpace2D& grid_cspace);
+    std::vector<std::pair<int, int>> getNeighborsPointAgent(const Eigen::Vector2d& cell, const amp::GridCSpace2D& grid_cspace);
+    Eigen::Vector2d getPointFromCell(const Eigen::Vector2d& cell, const amp::GridCSpace2D& grid_cspace);
+    void saveDistanceGridToCSV(const int* distance, std::size_t rows, std::size_t cols, const std::string& filename);
+    void saveGridCSpaceToCSV(const amp::GridCSpace2D& grid_cspace, const std::string& filename);
+    double wrapAngle(double angle);
 private:
     std::size_t m_cells_per_dim;
 };
