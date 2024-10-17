@@ -10,7 +10,8 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     nodes[0] = problem.q_init;
     nodes[1] = problem.q_goal;
     //generate n number of random points in the workspace and add them to the graph if not in obstacle
-    int n = 1500;
+    int n = m_numSamples;
+    double radius = m_connectionRadius;
     std::random_device rd;
     std::mt19937 gen(rd());
     Eigen::Vector2d random_node;
@@ -34,7 +35,6 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     }
 
     // Connect nodes
-    double radius = 1.5;
     for (const auto& [node1, point1] : nodes) {
         for (const auto& [node2, point2] : nodes) {
             double distance = (point1 - point2).norm();
@@ -57,7 +57,7 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
         heuristic.heuristic_values[node] = (point - problem.q_goal).norm();
     }
     MyAStarAlgo::GraphSearchResult astar_result = astar.search(graph_problem, heuristic);
-
+    m_success = astar_result.success;
     // Convert node path to waypoints
     for (auto node : astar_result.node_path) {
         path.waypoints.push_back(nodes[node]);
@@ -68,7 +68,7 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
 
 
 // point in polygon
-bool MyPRM::point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle){
+bool point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle){
     std::vector<Eigen::Vector2d> polygon = obstacle.verticesCW();
     int num_vertices = polygon.size();
     double x = point.x(), y = point.y();
@@ -124,7 +124,96 @@ bool MyPRM::point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obsta
 // Implement your RRT algorithm here
 amp::Path2D MyRRT::plan(const amp::Problem2D& problem) {
     amp::Path2D path;
-    path.waypoints.push_back(problem.q_init);
-    path.waypoints.push_back(problem.q_goal);
+    // Create a graph and a map for nodes
+    graphPtr = std::make_shared<amp::Graph<double>>();
+    nodes = std::map<amp::Node, Eigen::Vector2d>();
+    MyAStarAlgo::GraphSearchResult astar_result;
+    nodes[0] = problem.q_init;
+    nodes[1] = problem.q_goal;
+    Eigen::Vector2d nearest_node_location = nodes[0];
+    Node nearest_node = 0;
+    double step_size = 0.5;
+    double episilon_goal = 0.25;
+    double p_goal = 0.1;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    Eigen::Vector2d random_node;
+    int max_iter = 5000;
+    while(true){
+        while(true){
+            // Generate a random node in free space
+            // generate a random number between 0 and 1
+            std::uniform_real_distribution<double> random_number(0,1);
+            if(random_number(gen) < p_goal){
+                random_node = problem.q_goal;
+            }else{
+                std::uniform_real_distribution<double> x(problem.x_min,problem.x_max);
+                std::uniform_real_distribution<double> y(problem.y_min,problem.y_max);
+                random_node = Eigen::Vector2d(x(gen),y(gen));
+            }
+            // Check if the node is in free space
+            bool in_free_space = true;
+            for (const auto& obstacle : problem.obstacles) {
+                if (point_in_polygon(random_node, obstacle)) {
+                    in_free_space = false;
+                    break;
+                }
+            }
+            if(in_free_space){
+            break;
+                }
+        }
+        // Initialize the nearest node
+        double nearest_node_distance = std::numeric_limits<double>::max();
+        Node nearest_node = 0;
+        Eigen::Vector2d nearest_node_location = nodes[0];
+        // Take a step from the nearest node towards the random node defined by the step size
+        for (const auto& [node, point] : nodes) {
+            if ((point - random_node).norm() <= nearest_node_distance && node != 1) {
+                nearest_node = node;
+                nearest_node_location = point;
+                nearest_node_distance = (point - random_node).norm();
+            }
+        }
+        Eigen::Vector2d step = (random_node - nearest_node_location);
+        Eigen::Vector2d new_node_location = nearest_node_location + step_size * step.normalized();
+        // Check if the new node is in free space
+        bool in_free_space = true;
+        for (const auto& obstacle : problem.obstacles) {
+            bool intersects = HW4Functions::lineSegmentIntersection(problem, nearest_node_location, new_node_location);
+            if (intersects) {
+                in_free_space = false;
+                break;
+            }else{
+                Node new_node_index = nodes.size();
+                nodes[new_node_index] = new_node_location;
+                // connect the node to the nearest node
+                graphPtr->connect(nearest_node, new_node_index, (new_node_location - nearest_node_location).norm());
+            }
+        }
+        if((new_node_location - problem.q_goal).norm() < episilon_goal){
+            graphPtr->connect(nearest_node, 1, (new_node_location - nearest_node_location).norm());
+            std::cout << "Goal reached" << std::endl;
+            break;
+        }
+        if(max_iter == 0){
+            std::cout << "Max iterations reached" << std::endl;
+            break;
+        }
+        max_iter--;
+    }
+    amp::ShortestPathProblem graph_problem;
+    graph_problem.init_node = 0;
+    graph_problem.goal_node = 1;
+    graph_problem.graph = graphPtr;
+    MyAStarAlgo astar;
+    amp::LookupSearchHeuristic heuristic;
+    for (const auto& [node, point] : nodes) {
+        heuristic.heuristic_values[node] = (point - problem.q_goal).norm();
+    }
+    astar_result = astar.search(graph_problem, heuristic);
+    for (auto node : astar_result.node_path) {
+        path.waypoints.push_back(nodes[node]);
+    }
     return path;
 }

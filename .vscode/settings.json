@@ -77,6 +77,14 @@
         "filesystem": "cpp",
         "types": "cpp",
         "mixinvector": "cpp",
-        "fast_back_stack": "cpp"
+        "fast_back_stack": "cpp",
+        "numbers": "cpp",
+        "print": "cpp",
+        "atomic": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "numeric": "cpp",
+        "format": "cpp",
+        "cinttypes": "cpp"
     }
 }

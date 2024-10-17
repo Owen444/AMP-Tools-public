@@ -36,7 +36,7 @@ MyAStarAlgo::GraphSearchResult MyAStarAlgo::search(const amp::ShortestPathProble
                 //std::cout << "Child: " << child << " Parent: " << current << std::endl;
                 parent[child] = current;
                 path_cost[child] = path_cost[current] + edge_cost;
-                total_cost = path_cost[child]; //+ heuristic(child);
+                total_cost = path_cost[child] + heuristic(child);
                 Queue.push(std::make_pair(total_cost, child));
             }
         }
@@ -50,6 +50,6 @@ MyAStarAlgo::GraphSearchResult MyAStarAlgo::search(const amp::ShortestPathProble
     std::cout << "Count: " << count << std::endl;
     result.node_path.push_front(problem.init_node);
     result.path_cost = path_cost[problem.goal_node];
-    result.print();
+    //result.print();
     return result;
 }

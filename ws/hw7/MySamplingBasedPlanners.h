@@ -6,11 +6,32 @@
 #include "MyAStar.h"
 // Include the correct homework headers
 #include "hw/HW7.h"
-
+bool point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle);
 class MyPRM : public amp::PRM2D {
     public:
+        MyPRM(int numSamples = 200, double connectionRadius = 1.5) 
+            : m_numSamples(numSamples), m_connectionRadius(connectionRadius) {}
         virtual amp::Path2D plan(const amp::Problem2D& problem) override; 
-        bool point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle);
+        std::shared_ptr<amp::Graph<double>> getGraphPtr() const {
+            return graphPtr;
+        }
+        const std::map<amp::Node, Eigen::Vector2d>& getNodes() const {
+            return nodes;
+        }
+        bool getSuccess() const {
+            return m_success;
+        }   
+    private:
+        std::map<amp::Node, Eigen::Vector2d> nodes;
+        std::shared_ptr<amp::Graph<double>> graphPtr;
+        int m_numSamples;
+        double m_connectionRadius;
+        bool m_success;
+};
+
+class MyRRT : public amp::GoalBiasRRT2D {
+    public:
+        virtual amp::Path2D plan(const amp::Problem2D& problem) override; 
         std::shared_ptr<amp::Graph<double>> getGraphPtr() const {
             return graphPtr;
         }
@@ -20,11 +41,6 @@ class MyPRM : public amp::PRM2D {
     private:
         std::map<amp::Node, Eigen::Vector2d> nodes;
         std::shared_ptr<amp::Graph<double>> graphPtr;
-};
-
-class MyRRT : public amp::GoalBiasRRT2D {
-    public:
-        virtual amp::Path2D plan(const amp::Problem2D& problem) override; 
 };
 
 struct LookupSearchHeuristic : public amp::SearchHeuristic {
