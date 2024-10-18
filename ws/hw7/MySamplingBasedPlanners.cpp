@@ -14,10 +14,14 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     double radius = m_connectionRadius;
     std::random_device rd;
     std::mt19937 gen(rd());
+    std::uniform_real_distribution<double> x(problem.x_min,problem.x_max);
+    std::uniform_real_distribution<double> y(problem.y_min,problem.y_max);
+    // std::uniform_real_distribution<double> x(-1,11);
+    // std::uniform_real_distribution<double> y(-3,3);
     Eigen::Vector2d random_node;
+
     for (int i = 0; i < n; i++) {
-        std::uniform_real_distribution<double> x(problem.x_min,problem.x_max);
-        std::uniform_real_distribution<double> y(problem.y_min,problem.y_max);
+
         random_node = Eigen::Vector2d(x(gen),y(gen));
         // check if the point is in free space
         bool in_free_space = true;
@@ -34,8 +38,10 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
             }
     }
 
-    // Connect nodes
+    // Connect nodes and create heuristic
+     amp::LookupSearchHeuristic heuristic;
     for (const auto& [node1, point1] : nodes) {
+         heuristic.heuristic_values[node1] = (point1 - problem.q_goal).norm();
         for (const auto& [node2, point2] : nodes) {
             double distance = (point1 - point2).norm();
             bool intersect = HW4Functions::lineSegmentIntersection(problem, point1, point2);
@@ -43,19 +49,17 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
                 graphPtr->connect(node1, node2, distance);
             }
         }
-    }
 
+    }
+    // Set the heuristic value for the initial node to 0
+    heuristic.heuristic_values[0] = 0;
     // Find path using A*
     amp::ShortestPathProblem graph_problem;
     graph_problem.init_node = 0;
     graph_problem.goal_node = 1;
     graph_problem.graph = graphPtr;
-    
+
     MyAStarAlgo astar;
-    amp::LookupSearchHeuristic heuristic;
-    for (const auto& [node, point] : nodes) {
-        heuristic.heuristic_values[node] = (point - problem.q_goal).norm();
-    }
     MyAStarAlgo::GraphSearchResult astar_result = astar.search(graph_problem, heuristic);
     m_success = astar_result.success;
     // Convert node path to waypoints
@@ -132,13 +136,13 @@ amp::Path2D MyRRT::plan(const amp::Problem2D& problem) {
     nodes[1] = problem.q_goal;
     Eigen::Vector2d nearest_node_location = nodes[0];
     Node nearest_node = 0;
-    double step_size = 0.5;
+    double step_size = m_stepSize;
     double episilon_goal = 0.25;
-    double p_goal = 0.1;
+    double p_goal = m_goalBias;
     std::random_device rd;
     std::mt19937 gen(rd());
     Eigen::Vector2d random_node;
-    int max_iter = 5000;
+    int max_iter = m_numSamples;
     while(true){
         while(true){
             // Generate a random node in free space
