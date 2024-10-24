@@ -85,6 +85,12 @@
         "*.tcc": "cpp",
         "numeric": "cpp",
         "format": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "forward_list": "cpp",
+        "bufferobject": "cpp",
+        "image": "cpp",
+        "texture": "cpp",
+        "vertexarraystate": "cpp",
+        "buffered_value": "cpp"
     }
 }
