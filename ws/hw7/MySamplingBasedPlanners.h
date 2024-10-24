@@ -12,15 +12,10 @@ class MyPRM : public amp::PRM2D {
         MyPRM(int numSamples = 200, double connectionRadius = 1.5) 
             : m_numSamples(numSamples), m_connectionRadius(connectionRadius) {}
         virtual amp::Path2D plan(const amp::Problem2D& problem) override; 
-        std::shared_ptr<amp::Graph<double>> getGraphPtr() const {
-            return graphPtr;
-        }
-        const std::map<amp::Node, Eigen::Vector2d>& getNodes() const {
-            return nodes;
-        }
-        bool getSuccess() const {
-            return m_success;
-        }   
+        amp::Path2D PathSmoothing(const amp::Path2D& path, const amp::Problem2D& problem);
+        std::shared_ptr<amp::Graph<double>> getGraphPtr() const {return graphPtr;}
+        const std::map<amp::Node, Eigen::Vector2d>& getNodes() const {return nodes;}
+        bool getSuccess() const {return m_success;}
     private:
         std::map<amp::Node, Eigen::Vector2d> nodes;
         std::shared_ptr<amp::Graph<double>> graphPtr;

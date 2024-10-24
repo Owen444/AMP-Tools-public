@@ -66,65 +66,37 @@ amp::Path2D MyPRM::plan(const amp::Problem2D& problem) {
     for (auto node : astar_result.node_path) {
         path.waypoints.push_back(nodes[node]);
     }
-
+    path = PathSmoothing(path, problem);
     return path;
 }
 
-
-// point in polygon
-bool point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle){
-    std::vector<Eigen::Vector2d> polygon = obstacle.verticesCW();
-    int num_vertices = polygon.size();
-    double x = point.x(), y = point.y();
-    bool inside = false;
  
-    // Store the first point in the polygon and initialize
-    // the second point
-    Eigen::Vector2d p1 = polygon[0], p2;
- 
-    // Loop through each edge in the polygon
-    for (int i = 1; i <= num_vertices; i++) {
-        // Get the next point in the polygon
-        p2 = polygon[i % num_vertices];
- 
-        // Check if the point is above the minimum y
-        // coordinate of the edge
-        if (y > std::min(p1.y(), p2.y())) {
-            // Check if the point is below the maximum y
-            // coordinate of the edge
-            if (y <= std::max(p1.y(), p2.y())) {
-                // Check if the point is to the left of the
-                // maximum x coordinate of the edge
-                if (x <= std::max(p1.x(), p2.x())) {
-                    // Calculate the x-intersection of the
-                    // line connecting the point to the edge
-                    double x_intersection
-                        = (y - p1.y()) * (p2.x() - p1.x())
-                              / (p2.y() - p1.y())
-                          + p1.x();
- 
-                    // Check if the point is on the same
-                    // line as the edge or to the left of
-                    // the x-intersection
-                    if (p1.x() == p2.x()
-                        || x <= x_intersection) {
-                        // Flip the inside flag
-                        inside = !inside;
-                    }
+amp::Path2D MyPRM::PathSmoothing(const amp::Path2D& path, const amp::Problem2D& problem){
+    amp::Path2D smoothed_path;
+    Eigen::Vector2d point1 = path.waypoints[0]; 
+    smoothed_path.waypoints.push_back(point1);
+    // Check if points can be connected without intersection
+    if(!m_success){
+        return path;
+    }
+    while(true){    
+        for(int j = path.waypoints.size()-1; j>0; j--){
+            if(path.waypoints[j] !=point1){
+                Eigen::Vector2d point2 = path.waypoints[j];
+                bool intersects = HW4Functions::lineSegmentIntersection(problem, point1, point2);
+                if(!intersects){
+                    smoothed_path.waypoints.push_back(point2);
+                    point1 = point2;
+                    break;
                 }
             }
         }
- 
-        // Store the current point as the first point for
-        // the next iteration
-        p1 = p2;
+        if(point1 == problem.q_goal){
+            break;
+        }
     }
- 
-    // Return the value of the inside flag
-    return inside;
+    return smoothed_path;
 }
- 
-
 // Implement your RRT algorithm here
 amp::Path2D MyRRT::plan(const amp::Problem2D& problem) {
     amp::Path2D path;
@@ -220,4 +192,58 @@ amp::Path2D MyRRT::plan(const amp::Problem2D& problem) {
         path.waypoints.push_back(nodes[node]);
     }
     return path;
+}
+
+
+// point in polygon
+bool point_in_polygon(Eigen::Vector2d point, const amp::Obstacle2D& obstacle){
+    std::vector<Eigen::Vector2d> polygon = obstacle.verticesCW();
+    int num_vertices = polygon.size();
+    double x = point.x(), y = point.y();
+    bool inside = false;
+ 
+    // Store the first point in the polygon and initialize
+    // the second point
+    Eigen::Vector2d p1 = polygon[0], p2;
+ 
+    // Loop through each edge in the polygon
+    for (int i = 1; i <= num_vertices; i++) {
+        // Get the next point in the polygon
+        p2 = polygon[i % num_vertices];
+ 
+        // Check if the point is above the minimum y
+        // coordinate of the edge
+        if (y > std::min(p1.y(), p2.y())) {
+            // Check if the point is below the maximum y
+            // coordinate of the edge
+            if (y <= std::max(p1.y(), p2.y())) {
+                // Check if the point is to the left of the
+                // maximum x coordinate of the edge
+                if (x <= std::max(p1.x(), p2.x())) {
+                    // Calculate the x-intersection of the
+                    // line connecting the point to the edge
+                    double x_intersection
+                        = (y - p1.y()) * (p2.x() - p1.x())
+                              / (p2.y() - p1.y())
+                          + p1.x();
+ 
+                    // Check if the point is on the same
+                    // line as the edge or to the left of
+                    // the x-intersection
+                    if (p1.x() == p2.x()
+                        || x <= x_intersection) {
+                        // Flip the inside flag
+                        inside = !inside;
+                    }
+                }
+            }
+        }
+ 
+        // Store the current point as the first point for
+        // the next iteration
+        p1 = p2;
+    }
+ 
+    // Return the value of the inside flag
+    return inside;
 }
