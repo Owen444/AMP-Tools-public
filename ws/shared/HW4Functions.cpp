@@ -74,6 +74,8 @@ bool HW4Functions::lineSegmentIntersection(const amp::Environment2D& env, Eigen:
            Eigen::Vector2d vertex1 = verticies[i];
            Eigen::Vector2d vertex2 = verticies[(i+1)%verticies.size()];
            if(Intersect(P1,P2,vertex1,vertex2)){
+                // std::cout<<vertex1<<std::endl;
+                // std::cout<<vertex2<<std::endl;
                return true;
            }
         }
