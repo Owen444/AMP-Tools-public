@@ -257,7 +257,7 @@ amp::MultiAgentPath2D MyDecentralPlanner::plan(const amp::MultiAgentProblem2D& p
     amp::MultiAgentPath2D path;
     std::cout << "Number of Agents: " << problem.numAgents() << std::endl;
     int iteration = 0;
-    int max_iter = 15000;
+    int max_iter = 10000;
     bool collision;
     amp::Path2D agent_path = MultiAgentRRT(problem, problem.agent_properties[0].q_init, problem.agent_properties[0].q_goal,0);
     path.agent_paths.push_back(agent_path);
@@ -376,9 +376,9 @@ amp::Path2D MyDecentralPlanner::MultiAgentRRT(amp::MultiAgentProblem2D problem, 
     // Define Constants and Initial node
     nodes[0] = q_init;
     Eigen::Vector2d nearest_node_location = nodes[0];
-    double step_size = 0.1;
+    double step_size = 0.5;
     double episilon_goal = 0.25;
-    double p_goal = 0.2;
+    double p_goal = 0.05;
     int max_iter = 5000;
     int iteration = 0;
     // Define the random number generator

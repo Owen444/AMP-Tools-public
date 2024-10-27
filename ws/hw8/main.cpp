@@ -9,7 +9,7 @@ using namespace amp;
 int main(int argc, char** argv) {
    // Initialize Workspace 1 with 3 agents
     amp::RNG::seed(amp::RNG::randiUnbounded());
-    MultiAgentProblem2D problem = HW8::getWorkspace1(3);
+    MultiAgentProblem2D problem = HW8::getWorkspace1(2);
     std::vector<std::vector<Eigen::Vector2d>> collision_states;
     
     // // Solve using a centralized approach
@@ -72,8 +72,8 @@ int main(int argc, char** argv) {
     // std::vector<std::string> labels;
     // std::vector<double> times;
     // int num_success = 0;
-    // labels.push_back("2 Agents");
-    // for (int i = 0; i < 50; i++){
+    // labels.push_back("6 Agents");
+    // for (int i = 0; i < 100; i++){
     //     auto start = high_resolution_clock::now();
     //     MyDecentralPlanner decentral_planner;
     //     MultiAgentPath2D path = decentral_planner.plan(problem);
@@ -97,8 +97,8 @@ int main(int argc, char** argv) {
 
 
 
-    // //Visualize and grade methods
+    // // //Visualize and grade methods
     Visualizer::showFigures();
-    //HW8::grade<MyCentralPlanner, MyDecentralPlanner>("owen.craig@colorado.edu", argc, argv, std::make_tuple(), std::make_tuple());
+   // HW8::grade<MyCentralPlanner, MyDecentralPlanner>("owen.craig@colorado.edu", argc, argv, std::make_tuple(), std::make_tuple());
     return 0;
 }
