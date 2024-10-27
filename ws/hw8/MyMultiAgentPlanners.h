@@ -20,9 +20,13 @@ class MyCentralPlanner : public amp::CentralizedMultiAgentRRT {
         bool AgentIntersection(amp::MultiAgentProblem2D problem, Eigen::Vector2d P1, Eigen::Vector2d P2);
         bool isSubpathCollisionFree(Eigen::VectorXd nearest_node_locations, Eigen::VectorXd step_meta_agent, const amp::MultiAgentProblem2D& problem);
         bool isSystemValid(amp::MultiAgentProblem2D problem, Eigen::VectorXd nearest_node_locations, Eigen::VectorXd meta_agent_k);
+        int getTreeSize(){return tree_size;}
+        bool getPathSuccess(){return path_success;}
     private:
         std::shared_ptr<amp::Graph<double>> graphPtr;
         std::vector<std::map<amp::Node, Eigen::Vector2d>> node_maps;
+        int tree_size;
+        bool path_success;
 };
 
 
@@ -32,6 +36,7 @@ class MyDecentralPlanner : public amp::DecentralizedMultiAgentRRT {
         amp::Path2D MultiAgentRRT(amp::MultiAgentProblem2D problem, Eigen::Vector2d q_init, Eigen::Vector2d q_goal,int agent_index);
         amp::MultiAgentProblem2D expand_obstacles(const amp::MultiAgentProblem2D& problem);
         bool isStepValid(amp::MultiAgentProblem2D problem, Eigen::Vector2d nearest_node_locations, Eigen::Vector2d agent_k, int agent_index);
+        bool get_success(){return path_success;}
         private:
         bool path_success;
 };  

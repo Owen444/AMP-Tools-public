@@ -47,6 +47,8 @@ amp::MultiAgentProblem2D MyCentralPlanner::expand_obstacles(const amp::MultiAgen
 
 amp::MultiAgentPath2D MyCentralPlanner::MultiAgentRRT(const amp::MultiAgentProblem2D& problem) {
     amp::MultiAgentPath2D path;
+    tree_size = 0;
+    path_success = false;
     // Define the parameters
     double step_size = 0.5;
     double episilon_goal = 0.25;
@@ -140,6 +142,7 @@ amp::MultiAgentPath2D MyCentralPlanner::MultiAgentRRT(const amp::MultiAgentProbl
             amp::Node new_node = meta_node_map.size();
             if((step_meta_agent - goal_meta_agent).norm() <= episilon_goal){
                 std::cout << "Goal Found for Meta Agent" << std::endl;
+                path_success = true;
                 meta_node_map[new_node] = goal_meta_agent;
                 parent_map[new_node] = nearest_node;
                 break;
@@ -187,6 +190,7 @@ amp::MultiAgentPath2D MyCentralPlanner::MultiAgentRRT(const amp::MultiAgentProbl
         path.agent_paths.push_back(agent_path);
         i+=2;
     }
+    tree_size = meta_node_map.size();
     return path;
 }
 
