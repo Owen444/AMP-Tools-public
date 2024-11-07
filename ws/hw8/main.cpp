@@ -59,10 +59,10 @@ int main(int argc, char** argv) {
     Visualizer::makeFigure(problem, path, collision_states);
 
 
-    // bool isValid2 = HW8::generateAndCheck(decentral_planner, path, problem, collision_states);
-    // amp::MultiAgentProblem2D expanded_problem = decentral_planner.expand_obstacles(problem);
-    // Visualizer::makeFigure(problem, path, collision_states);
-    // //Visualizer::makeFigure(expanded_problem, path, collision_states);
+    bool isValid2 = HW8::generateAndCheck(decentral_planner, path, problem, collision_states);
+    amp::MultiAgentProblem2D expanded_problem = decentral_planner.expand_obstacles(problem);
+    Visualizer::makeFigure(problem, path, collision_states);
+    //Visualizer::makeFigure(expanded_problem, path, collision_states);
 
 
 
@@ -99,6 +99,6 @@ int main(int argc, char** argv) {
 
     // // //Visualize and grade methods
     Visualizer::showFigures();
-   // HW8::grade<MyCentralPlanner, MyDecentralPlanner>("owen.craig@colorado.edu", argc, argv, std::make_tuple(), std::make_tuple());
+    //HW8::grade<MyCentralPlanner, MyDecentralPlanner>("owen.craig@colorado.edu", argc, argv, std::make_tuple(), std::make_tuple());
     return 0;
 }
