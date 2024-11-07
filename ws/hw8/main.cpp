@@ -6,10 +6,31 @@
 using namespace std::chrono;
 using namespace amp;
 
+<<<<<<< HEAD
 int main(int argc, char** argv) {
    // Initialize Workspace 1 with 3 agents
     amp::RNG::seed(amp::RNG::randiUnbounded());
     MultiAgentProblem2D problem = HW8::getWorkspace1(2);
+=======
+void timer_example() {
+    double startTime;
+    amp::Timer timer("timer");
+    for (int i=0; i < 5; ++i) {
+        startTime = timer.now(TimeUnit::ms);  
+        std::cout << "Press any key to continue...\n";
+        std::cin.get();
+        std::cout << "Time since last run: " << timer.now(TimeUnit::ms) - startTime << std::endl;
+    }
+    timer.stop();
+    std::cout << "Total time since last run: " << Profiler::getTotalProfile("timer") << std::endl;
+}
+
+int main(int argc, char** argv) {
+    // Initializing workspace 1 with 3 agents
+    amp::RNG::seed(amp::RNG::randiUnbounded());
+    MultiAgentPath2D path;
+    MultiAgentProblem2D problem = HW8::getWorkspace1(3);
+>>>>>>> upstream/main
     std::vector<std::vector<Eigen::Vector2d>> collision_states;
     
     // // Solve using a centralized approach
@@ -51,6 +72,14 @@ int main(int argc, char** argv) {
     // std::cout<<"Average Time: "<<std::accumulate(times.begin(), times.end(), 0.0) / times.size()<<std::endl;
     // std::cout<<"Average Graph Size: "<<std::accumulate(graph_sizes.begin(), graph_sizes.end(), 0.0) / graph_sizes.size()<<std::endl;
 
+<<<<<<< HEAD
+=======
+    // Solve using a centralized approach
+    MyCentralPlanner central_planner;
+    path = central_planner.plan(problem);
+    bool isValid = HW8::check(path, problem, collision_states);
+    Visualizer::makeFigure(problem, path, collision_states);
+>>>>>>> upstream/main
 
     // Solve using a decentralized approach
     MyDecentralPlanner decentral_planner;
