@@ -2,8 +2,9 @@
 
 #include <vector>
 #include <Eigen/Core>
-
 #include "tools/Serializer.h"
+#include "tools/Environment.h"
+
 
 namespace amp {
 
