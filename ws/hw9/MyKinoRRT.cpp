@@ -1,7 +1,7 @@
 #include "MyKinoRRT.h"
 using namespace amp;
 void MySingleIntegrator::propagate(Eigen::VectorXd& state, Eigen::VectorXd& control, double dt) {
-    int numSteps = 200;
+    int numSteps = 10;
     double h = dt / numSteps;
         
     for (int step = 0; step < numSteps; step++) {
@@ -115,18 +115,28 @@ void propagate_car(Eigen::VectorXd& state, Eigen::VectorXd& control, double dt,d
 amp::KinoPath MyKinoRRT::plan(const amp::KinodynamicProblem2D& problem_org, amp::DynamicAgent& agent) {
     //Recreate probelm with correct bounds
     amp::KinodynamicProblem2D problem = problem_org;
-    if(problem.agent_type == AgentType::FirstOrderUnicycle){
-        problem.u_bounds[0] = {-2, 4};
-        problem.u_bounds[1] = {-1.5, 1.5};
-    }
-    if(problem.agent_type == AgentType::SecondOrderUnicycle){
-        problem.u_bounds[0] = {-1, 1.5};
-        problem.u_bounds[1] = {-0.75, 0.75};
-    }
-    if(problem.agent_type == AgentType::SimpleCar){
-        problem.u_bounds[0] = {-1.5, 2};
-        problem.u_bounds[1] = {-0.3, 0.3};
-    }
+    //output control bounds
+    // std::cout<<"Control bounds: "<<problem.u_bounds[0].first<<", "<<problem.u_bounds[0].second<<", "<<problem.u_bounds[1].first<<", "<<problem.u_bounds[1].second<<std::endl;
+    // //output environment bounds
+    // std::cout<<"Environment bounds: "<<problem.x_min<<", "<<problem.x_max<<", "<<problem.y_min<<", "<<problem.y_max<<std::endl;
+    // //output all q bounds
+    // std::cout<<"Q bounds: ";
+    // for(const auto& q_bound : problem.q_bounds){
+    //     std::cout<<q_bound.first<<", "<<q_bound.second<<", ";
+    // }
+    // std::cout<<std::endl;
+    // if(problem.agent_type == AgentType::FirstOrderUnicycle){
+    //     problem.u_bounds[0] = {-2, 4};
+    //     problem.u_bounds[1] = {-1.5, 1.5};
+    // }
+    // if(problem.agent_type == AgentType::SecondOrderUnicycle){
+    //     problem.u_bounds[0] = {-1, 1.5};
+    //     problem.u_bounds[1] = {-0.75, 0.75};
+    // }
+    // if(problem.agent_type == AgentType::SimpleCar){
+    //     problem.u_bounds[0] = {-1, 0.5};
+    //     problem.u_bounds[1] = {-3, 3};
+    // }
     // Create path, node map and graph
     amp::KinoPath path;
     std::map<amp::Node, Eigen::VectorXd> nodes;
@@ -138,11 +148,10 @@ amp::KinoPath MyKinoRRT::plan(const amp::KinodynamicProblem2D& problem_org, amp:
     control_map[0] = Eigen::VectorXd::Zero(problem.q_init.size());
     // Define constants
     int n = m_numSamples;
-    double radius = m_connectionRadius;
     double p_goal = 0.05;
     double dt = 0.25;
     int iterations = 0;
-    int max_iterations = 150000;
+    int max_iterations = RRT_samples;
     // While solution is not found and number of samples is less than n
     while (true){
         Eigen::VectorXd q_rand = get_random_state(problem, p_goal);
@@ -387,10 +396,50 @@ void MyKinoRRT::simulate_car(Eigen::VectorXd& state, Eigen::VectorXd& control, d
           control(0),
           control(1);
     
+    //output all k values
+    // std::cout<<"K1: "<<k1.transpose()<<std::endl;
+    // std::cout<<"K2: "<<k2.transpose()<<std::endl;
+    // std::cout<<"K3: "<<k3.transpose()<<std::endl;
+    // std::cout<<"K4: "<<k4.transpose()<<std::endl;
+    // std::cout<<"dt: "<<dt<<std::endl;
     // Update state using RK4 formula
     state = state + (dt/6) * (k1 + 2*k2 + 2*k3 + k4);
+    //std::cout<<"State: "<<state.transpose()<<std::endl;
 }
 
+amp::KinoPath MyKinoRRT::simulatePathRK4(const amp::KinodynamicProblem2D& problem, const amp::KinoPath& plannedPath, amp::DynamicAgent& agent) {
+    amp::KinoPath simulatedPath;
+    agent.agent_dim = problem.agent_dim;
+    // output the size of the planned path
+    simulatedPath.valid = plannedPath.valid;
+    simulatedPath.waypoints.push_back(plannedPath.waypoints[0]);
+    simulatedPath.controls.push_back(plannedPath.controls[0]);
+    simulatedPath.durations.push_back(0.25);
+    int steps = 50;
+    for (size_t i = 1; i < plannedPath.controls.size(); i++) {
+        Eigen::VectorXd control = plannedPath.controls[i];
+        double duration = plannedPath.durations[i];
+        Eigen::VectorXd current_state = simulatedPath.waypoints.back();
+        // Simulate the trajectory in small steps
+        for (int j = 0; j < steps; j++) {
+            // std::cout<<"Current state: "<<current_state.transpose()<<std::endl;
+            // std::cout<<"Control: "<<control.transpose()<<std::endl;
+            // std::cout<<"Duration: "<<duration/steps<<std::endl;
+            simulate_car(current_state, control, duration/steps, agent.agent_dim.length);
+            simulatedPath.waypoints.push_back(current_state);
+            simulatedPath.controls.push_back(control);
+            simulatedPath.durations.push_back(duration/steps);
+            // std::cout<<"Current state: "<<current_state.transpose()<<std::endl;
+            // std::cout<<"Control: "<<control.transpose()<<std::endl;
+            // std::cout<<"Duration: "<<duration/steps<<std::endl;
+        }
+    }
+    // Output path, controls, and durations
+    std::cout<<"Simulated path waypoints: "<<simulatedPath.waypoints.size()<<std::endl;
+    std::cout<<"Simulated path controls: "<<simulatedPath.controls.size()<<std::endl;
+    std::cout<<"Simulated path durations: "<<simulatedPath.durations.size()<<std::endl;
+    return simulatedPath;
+}
 bool MyKinoRRT::PolygonPolygonIntersection(const amp::KinodynamicProblem2D& problem, amp::DynamicAgent& agent,Eigen::VectorXd state){
     std::vector<Eigen::Vector2d> robot_vertices;
     // The reference point is the center of the rear axle
@@ -444,6 +493,11 @@ bool MyKinoRRT::PolygonPolygonIntersection(const amp::KinodynamicProblem2D& prob
        y_ref > problem.y_max) {
         return true;
     }
-
+    // check all state is within bounds
+    for(int i = 0; i < state.size(); i++){
+        if(state(i) < problem.q_bounds[i].first || state(i) > problem.q_bounds[i].second){
+            return true;
+        }
+    }
     return false;
 }

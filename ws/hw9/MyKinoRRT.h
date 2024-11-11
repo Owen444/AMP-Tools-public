@@ -18,9 +18,12 @@ class MyKinoRRT : public amp::KinodynamicRRT {
         Eigen::VectorXd get_random_state(const amp::KinodynamicProblem2D& problem, double p_goal);
         void simulate_car(Eigen::VectorXd& state, Eigen::VectorXd& control, double dt,double L);
         bool PolygonPolygonIntersection(const amp::KinodynamicProblem2D& problem, amp::DynamicAgent& agent,Eigen::VectorXd state);
+        amp::KinoPath simulatePathRK4(const amp::KinodynamicProblem2D& problem, const amp::KinoPath& plannedPath, amp::DynamicAgent& agent);
+        void setMaxNodes(int n) { RRT_samples = n; }
+        void setNumControlSamples(int n) { m_numSamples = n; }
     private:
         int m_numSamples = 50;
-        double m_connectionRadius = 0.5;
+        double RRT_samples = 100000;
 };  
 
 class MySingleIntegrator : public amp::DynamicAgent {
