@@ -19,33 +19,52 @@ int main(int argc, char** argv) {
     //Select problem, plan, check, and visualize
     int select = 7;
     KinodynamicProblem2D prob = problems[select];
-//     MyKinoRRT kino_planner;
-//     kino_planner.setNumControlSamples(10);
-//     if(prob.agent_type == AgentType::FirstOrderUnicycle){
-//         prob.u_bounds[0] = {-2, 4};
-//         prob.u_bounds[1] = {-1.5, 1.5};
-//     }
-//     if(prob.agent_type == AgentType::SecondOrderUnicycle){
-//         prob.u_bounds[0] = {-1, 1.5};
-//         prob.u_bounds[1] = {-0.75, 0.75};
-//     }
-//     if(prob.agent_type == AgentType::SimpleCar){
-//         prob.u_bounds[0] = {-1.5, 2};
-//         prob.u_bounds[1] = {-0.3, 0.3};
-//     }
-  
-//     KinoPath path = kino_planner.plan(prob, *agentFactory[prob.agent_type]());
-//    KinoPath simulated_path = kino_planner.simulatePathRK4(prob, path, *agentFactory[prob.agent_type]());
-//     HW9::check(path, prob);
-//     if (path.valid){
-//         Visualizer::makeFigure(prob, path, false); // Set to 'true' to render animation
-//         //Visualizer::makeFigure(prob, simulated_path, false); // Set to 'true' to render animation
-//         Visualizer::showFigures();
-//     }
+    MyKinoRRT kino_planner;
+    kino_planner.setNumControlSamples(50);
+    if(prob.agent_type == AgentType::FirstOrderUnicycle){
+        prob.u_bounds[0] = {-2, 4};
+        prob.u_bounds[1] = {-1.5, 1.5};
+    }
+    if(prob.agent_type == AgentType::SecondOrderUnicycle){
+        prob.u_bounds[0] = {-1, 1.5};
+        prob.u_bounds[1] = {-0.75, 0.75};
+    }
+    if(prob.agent_type == AgentType::SimpleCar){
+        prob.u_bounds[0] = {-1.5, 2};
+        prob.u_bounds[1] = {-0.3, 0.3};
+    }
+    auto start = std::chrono::high_resolution_clock::now();
+    KinoPath path = kino_planner.plan(prob, *agentFactory[prob.agent_type]());
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+    std::cout<<"Time taken: "<<duration.count()/1000.0<<" seconds"<<std::endl;
+   //KinoPath simulated_path = kino_planner.simulatePathRK4(prob, path, *agentFactory[prob.agent_type]());
+    HW9::check(path, prob);
+    if (path.valid){
+        Visualizer::makeFigure(prob, path, true); // Set to 'true' to render animation
+        double length = 0.0;
+        for (int i = 1; i < path.waypoints.size(); i++) {
+            length += (path.waypoints[i] - path.waypoints[i - 1]).norm();
+        }
+        std::cout<<"Path length: "<<length<<std::endl;
+        // Save controls to CSV
+        std::ofstream outFile("/Users/owencraig/Desktop/AMP MISC/path_controls.csv");
+        outFile << "time,control_1,control_2\n";  // Header row
+        for (size_t i = 0; i < path.controls.size(); i++) {
+            outFile << path.durations[i] << "," 
+                   << path.controls[i][0] << "," 
+                   << path.controls[i][1] << "\n";
+        }
+        outFile.close();
+        std::cout << "Controls saved to path_controls.csv" << std::endl;
+
+        //Visualizer::makeFigure(prob, simulated_path, false); // Set to 'true' to render animation
+        Visualizer::showFigures();
+    }
 
 
 //Benchmark
-// Benchmarking parameters
+//Benchmarking parameters
     // const std::vector<std::pair<int, int>> configurations = {
     //     {100000, 1}, {100000, 5}, {100000, 10}, {100000, 15}
     // };
@@ -65,7 +84,7 @@ int main(int argc, char** argv) {
     //     int num_success = 0;
         
     //     // Run multiple trials for this configuration
-    //     for (int i = 0; i < 100; i++) {
+    //     for (int i = 0; i < 10; i++) {
     //         MyKinoRRT kino_planner;
     //         auto start = std::chrono::high_resolution_clock::now();
     //         // Set the parameters for this run

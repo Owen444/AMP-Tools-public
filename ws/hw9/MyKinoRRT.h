@@ -23,7 +23,7 @@ class MyKinoRRT : public amp::KinodynamicRRT {
         void setNumControlSamples(int n) { m_numSamples = n; }
     private:
         int m_numSamples = 50;
-        double RRT_samples = 100000;
+        double RRT_samples = 150000;
 };  
 
 class MySingleIntegrator : public amp::DynamicAgent {

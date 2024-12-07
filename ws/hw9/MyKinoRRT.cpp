@@ -34,7 +34,8 @@ Eigen::VectorXd MyKinoRRT::get_random_state(const amp::KinodynamicProblem2D& pro
     std::uniform_real_distribution<double> sigma(-3, 4);
     std::uniform_real_distribution<double> w(-1.5, 1.5);
     std::uniform_real_distribution<double> v(-3, 6);
-    std::uniform_real_distribution<double> phi(-M_PI/3, M_PI/3);
+    //std::uniform_real_distribution<double> phi(-M_PI/3, M_PI/3);
+    std::uniform_real_distribution<double> phi(-M_PI/4, M_PI/4);
     // Sample a random configuration
     std::uniform_real_distribution<double> random_number(0,1);
     Eigen::VectorXd q_rand;
